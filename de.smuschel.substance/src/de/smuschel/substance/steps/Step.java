@@ -10,9 +10,6 @@ import org.eclipse.swt.widgets.Event;
 
 public class Step extends Composite {
 
-	public static final int FIRST = 1;
-	public static final int LAST = 2;
-
 	private String text;
 	private String description;
 	private Color activeColor;
@@ -84,11 +81,30 @@ public class Step extends Composite {
 	}
 
 	public Color getInactiveDescriptionColor() {
-		return inactiveDescriptionColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY) : inactiveDescriptionColor;
+		return inactiveDescriptionColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY)
+				: inactiveDescriptionColor;
 	}
 
 	public void setInactiveDescriptionColor(Color inactiveDescriptionColor) {
 		this.inactiveDescriptionColor = inactiveDescriptionColor;
+	}
+
+	protected Color getBackgroundColor() {
+		if (isEnabled())
+			return getActiveColor();
+		return getInactiveColor();
+	}
+
+	protected Color getForegroundColor() {
+		if (isEnabled())
+			return getActiveTextColor();
+		return getInactiveTextColor();
+	}
+
+	protected Color getDescriptionForegroundColor() {
+		if (isEnabled())
+			return getActiveDescriptionColor();
+		return getInactiveDescriptionColor();
 	}
 
 	protected void init() {
@@ -97,8 +113,12 @@ public class Step extends Composite {
 
 	protected void paint(Event e) {
 		GC gc = e.gc;
+		Rectangle area = getClientArea();
+		draw(gc, area);
+	}
+
+	protected void draw(GC gc, Rectangle area) {
 		setupGC(gc);
-		final Rectangle area = getClientArea();
 		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		drawStep(gc, area);
 	}
@@ -114,63 +134,54 @@ public class Step extends Composite {
 	protected void drawEndLine(GC gc, final Rectangle area) {
 		if (!isLastStep()) {
 			if (isVertical())
-				gc.drawLine(area.width / 2, area.height / 2 + 20, area.width / 2, area.height);
+				gc.drawLine(area.width / 2, area.y + area.height / 2 + 20, area.width / 2, area.y + area.height);
 			else
-				gc.drawLine(area.width / 2 + 20, area.height / 2, area.width, area.height / 2);
+				gc.drawLine(area.x + area.width / 2 + 20, area.height / 2, area.x + area.width, area.height / 2);
 		}
 	}
 
 	protected void drawBeginningLine(GC gc, final Rectangle area) {
 		if (!isFirstStep()) {
 			if (isVertical())
-				gc.drawLine(area.width / 2, 0, area.width / 2, area.height / 2 - 20);
+				gc.drawLine(area.width / 2, area.y, area.width / 2, area.y + area.height / 2 - 20);
 			else
-				gc.drawLine(0, area.height / 2, area.width / 2 - 20, area.height / 2);
+				gc.drawLine(area.x, area.height / 2, area.x + area.width / 2 - 20, area.height / 2);
 		}
 	}
 
 	protected void drawCircle(GC gc, Rectangle area) {
-		if (isEnabled())
-			gc.setBackground(getActiveColor());
-		else
-			gc.setBackground(getInactiveColor());
-		gc.fillOval(area.width / 2 - 16, area.height / 2 - 16, 32, 32);
+		gc.setBackground(getBackgroundColor());
+		gc.fillOval(area.x + area.width / 2 - 16, area.y + area.height / 2 - 16, 32, 32);
 	}
 
 	protected void drawContent(GC gc, Rectangle area) {
-		if (isEnabled())
-			gc.setForeground(getActiveTextColor());
-		else
-			gc.setForeground(getInactiveTextColor());
+		gc.setForeground(getForegroundColor());
 		Point extent = gc.stringExtent(getText());
-		gc.drawText(getText(), area.width / 2 - extent.x / 2, area.height / 2 - extent.y / 2);
+		gc.drawText(getText(), area.x + area.width / 2 - extent.x / 2, area.y + area.height / 2 - extent.y / 2);
 	}
 
 	protected void drawDescription(GC gc, Rectangle area) {
 		String description = getDescription();
 		if (description != null && description.length() > 0) {
-			if (isEnabled())
-				gc.setForeground(getActiveDescriptionColor());
-			else
-				gc.setForeground(getInactiveDescriptionColor());
+			gc.setForeground(getDescriptionForegroundColor());
 			Point textExtent = gc.textExtent(description);
 			if (isVertical())
-				gc.drawText(description, area.width / 2 + 48, area.height / 2 - textExtent.y / 2, true);
+				gc.drawText(description, area.width / 2 + 48, area.y + area.height / 2 - textExtent.y / 2, true);
 			else
-				gc.drawText(description, area.width / 2 - textExtent.x / 2, area.height / 2 + 32, true);
+				gc.drawText(description, area.x + area.width / 2 - textExtent.x / 2, area.height / 2 + 32, true);
 		}
 	}
 
 	private boolean isVertical() {
-		return (getStyle() & SWT.VERTICAL) == SWT.VERTICAL;
+		return (getStyle() & MultiSteps.VERTICAL) == MultiSteps.VERTICAL;
 	}
 
 	private boolean isLastStep() {
-		return (getStyle() & LAST) == LAST;
+		return (getStyle() & MultiSteps.LAST) == MultiSteps.LAST;
 	}
 
 	private boolean isFirstStep() {
-		return (getStyle() & FIRST) == FIRST;
+		return (getStyle() & MultiSteps.FIRST) == MultiSteps.FIRST;
 	}
 
 	protected void setupGC(GC gc) {
