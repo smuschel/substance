@@ -51,6 +51,11 @@ public class MultiStepsBuilder {
 		step.setActiveDescriptionColor(configuration.getActiveDescriptionColor());
 		step.setInactiveTextColor(configuration.getInactiveTextColor());
 		step.setInactiveDescriptionColor(configuration.getInactiveDescriptionColor());
+
+		step.setActiveFont(configuration.getActiveFont());
+		step.setActiveDescriptionFont(configuration.getActiveDescriptionFont());
+		step.setInactiveFont(configuration.getInactiveFont());
+		step.setInactiveDescriptionFont(configuration.getInactiveDescriptionFont());
 		step.setEnabled(false);
 	}
 }

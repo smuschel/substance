@@ -2,6 +2,7 @@ package de.smuschel.substance.steps;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -24,6 +25,17 @@ public class MultiSteps extends Canvas {
 
 	protected void init() {
 		addListener(SWT.Paint, e -> paint(e));
+		addListener(SWT.MouseUp, e -> click(e));
+	}
+
+	protected void click(Event e) {
+		Point clickLocation = new Point(e.x, e.y);
+		for (int i = 0; i < getChildren().length; i++) {
+			Step step = (Step) getChildren()[i];
+			if (step.getActiveArea().contains(clickLocation)) {
+				setActiveStep(i);
+			}
+		}
 	}
 
 	protected void paint(Event e) {
@@ -65,6 +77,22 @@ public class MultiSteps extends Canvas {
 	public void previous() {
 		if (activeStep - 1 >= 0)
 			setActiveStep(activeStep - 1);
+	}
+
+	@Override
+	public Point computeSize(int wHint, int hHint, boolean changed) {
+		int height = hHint;
+		int width = wHint;
+		for (Control c : getChildren()) {
+			Step step = (Step) c;
+			Point size = step.computeSize();
+			if (isVertical()) {
+				width = Math.max(width, size.x);
+			} else {
+				height = Math.max(height, size.y);
+			}
+		}
+		return new Point(width, height);
 	}
 
 }

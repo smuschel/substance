@@ -1,6 +1,7 @@
 package de.smuschel.substance.steps;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 
 public class MultiStepConfiguration {
@@ -11,6 +12,10 @@ public class MultiStepConfiguration {
 	private Color inactiveTextColor;
 	private Color activeDescriptionColor;
 	private Color inactiveDescriptionColor;
+	private Font activeFont;
+	private Font inactiveFont;
+	private Font activeDescriptionFont;
+	private Font inactiveDescriptionFont;
 	private int orientation;
 	private Composite parent;
 
@@ -57,9 +62,44 @@ public class MultiStepConfiguration {
 		return this;
 	}
 
-
 	public MultiStepConfiguration parent(Composite parent) {
 		this.parent = parent;
+		return this;
+	}
+
+	Font getActiveFont() {
+		return activeFont;
+	}
+
+	public MultiStepConfiguration activeFont(Font activeFont) {
+		this.activeFont = activeFont;
+		return this;
+	}
+
+	Font getInactiveFont() {
+		return inactiveFont;
+	}
+
+	public MultiStepConfiguration inactiveFont(Font inactiveFont) {
+		this.inactiveFont = inactiveFont;
+		return this;
+	}
+
+	Font getActiveDescriptionFont() {
+		return activeDescriptionFont;
+	}
+
+	public MultiStepConfiguration activeDescriptionFont(Font activeDescriptionFont) {
+		this.activeDescriptionFont = activeDescriptionFont;
+		return this;
+	}
+
+	Font getInactiveDescriptionFont() {
+		return inactiveDescriptionFont;
+	}
+
+	public MultiStepConfiguration inactiveDescriptionFont(Font inactiveDescriptionFont) {
+		this.inactiveDescriptionFont = inactiveDescriptionFont;
 		return this;
 	}
 
@@ -94,4 +134,5 @@ public class MultiStepConfiguration {
 	Composite getParent() {
 		return parent;
 	}
+
 }
