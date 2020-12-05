@@ -1,6 +1,11 @@
 package de.smuschel.substance.steps;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -17,9 +22,11 @@ public class MultiSteps extends Canvas {
 	public static final int LAST = 8;
 
 	private int activeStep;
+	private List<SelectionListener> selectionListeners;
 
 	public MultiSteps(Composite parent, int style) {
 		super(parent, style);
+		selectionListeners = new ArrayList<>();
 		init();
 	}
 
@@ -65,6 +72,8 @@ public class MultiSteps extends Canvas {
 		newStep.setEnabled(true);
 		activeStep = index;
 
+		fireSelectionChanged(newStep, activeStep);
+
 		update();
 		redraw();
 	}
@@ -77,6 +86,25 @@ public class MultiSteps extends Canvas {
 	public void previous() {
 		if (activeStep - 1 >= 0)
 			setActiveStep(activeStep - 1);
+	}
+
+	public void addSelectionListener(SelectionListener listener) {
+		selectionListeners.add(listener);
+	}
+
+	public void removeSelectionListener(SelectionListener listener) {
+		selectionListeners.remove(listener);
+	}
+
+	protected void fireSelectionChanged(Step step, int index) {
+		Event e = new Event();
+		e.data = step;
+		e.index = index;
+		e.widget = this;
+		SelectionEvent event = new SelectionEvent(e);
+		for (SelectionListener listener : selectionListeners) {
+			listener.widgetSelected(event);
+		}
 	}
 
 	@Override

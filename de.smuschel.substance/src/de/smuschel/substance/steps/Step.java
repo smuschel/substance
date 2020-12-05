@@ -23,7 +23,6 @@ public class Step extends Composite {
 	private Font inactiveFont;
 	private Font inactiveDescriptionFont;
 	private Rectangle area;
-	private Point textExtent;
 
 	private static final int CIRCLE_RADIUS = 16;
 	private static final int LINE_MARGIN = 4;
@@ -225,7 +224,7 @@ public class Step extends Composite {
 		if (description != null && description.length() > 0) {
 			gc.setForeground(getDescriptionForegroundColor());
 			gc.setFont(getDescriptionFont());
-			textExtent = gc.textExtent(description);
+			Point textExtent = gc.textExtent(description);
 			if (isVertical())
 				gc.drawText(description, area.x + DESCRIPTION_OFFSET, area.y + area.height / 2 - textExtent.y / 2,
 						true);
@@ -254,6 +253,9 @@ public class Step extends Composite {
 	}
 
 	Point computeSize() {
+		final GC gc = new GC(getDisplay());
+		Point textExtent = gc.textExtent(description);
+		gc.dispose();
 		if (isVertical())
 			return new Point(textExtent.x + DESCRIPTION_OFFSET, -1);
 		return new Point(-1, DESCRIPTION_OFFSET + textExtent.y);
