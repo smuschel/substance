@@ -98,8 +98,8 @@ public class MultiSteps extends Canvas {
 
 	protected void fireSelectionChanged(Step step, int index) {
 		Event e = new Event();
-		e.data = step;
-		e.index = index;
+		e.item = step;
+		e.data = index;
 		e.widget = this;
 		SelectionEvent event = new SelectionEvent(e);
 		for (SelectionListener listener : selectionListeners) {
