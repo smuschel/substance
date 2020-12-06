@@ -10,6 +10,11 @@ import org.eclipse.swt.widgets.Composite;
 
 public class Step extends Composite {
 
+	private static final int CIRCLE_RADIUS = 16;
+	private static final int LINE_PADDING = 4;
+	private static final int DESCRIPTION_OFFSET = 48;
+	private static final int LINE_WIDTH = 1;
+
 	private String text;
 	private String description;
 	private Color activeColor;
@@ -18,6 +23,7 @@ public class Step extends Composite {
 	private Color activeDescriptionColor;
 	private Color inactiveTextColor;
 	private Color inactiveDescriptionColor;
+	private Color lineColor;
 	private Font activeFont;
 	private Font activeDescriptionFont;
 	private Font inactiveFont;
@@ -25,9 +31,10 @@ public class Step extends Composite {
 	private Rectangle area;
 	private boolean completed;
 
-	private static final int CIRCLE_RADIUS = 16;
-	private static final int LINE_MARGIN = 4;
-	private static final int DESCRIPTION_OFFSET = 48;
+	private int circleRadius;
+	private int linePadding;
+	private int descriptionOffset;
+	private int lineWidth;
 
 	public Step(Composite parent, int style) {
 		super(parent, style);
@@ -96,6 +103,14 @@ public class Step extends Composite {
 				: inactiveDescriptionColor;
 	}
 
+	public void setLineColor(Color lineColor) {
+		this.lineColor = lineColor;
+	}
+
+	public Color getLineColor() {
+		return lineColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY) : lineColor;
+	}
+
 	public Font getActiveFont() {
 		return activeFont;
 	}
@@ -132,6 +147,22 @@ public class Step extends Composite {
 		this.inactiveDescriptionColor = inactiveDescriptionColor;
 	}
 
+	public void setCircleRadius(int radius) {
+		this.circleRadius = radius;
+	}
+
+	public void setDescriptionOffset(int offset) {
+		this.descriptionOffset = offset;
+	}
+
+	public void setLinePadding(int padding) {
+		this.linePadding = padding;
+	}
+
+	public void setLineWidth(int width) {
+		this.lineWidth = width;
+	}
+
 	protected Font getTextFont() {
 		Font f = isEnabled() ? activeFont : inactiveFont;
 		return f == null ? getFont() : f;
@@ -160,18 +191,44 @@ public class Step extends Composite {
 		return getInactiveDescriptionColor();
 	}
 
+	protected int getCircleRadius() {
+		return circleRadius == -1 ? CIRCLE_RADIUS : circleRadius;
+	}
+
+	protected int getDescriptionOffset() {
+		return descriptionOffset == -1 ? DESCRIPTION_OFFSET : descriptionOffset;
+	}
+
+	protected int getLinePadding() {
+		return linePadding == -1 ? LINE_PADDING : linePadding;
+	}
+
+	protected int getLineWidth() {
+		return lineWidth == -1 ? LINE_WIDTH : lineWidth;
+	}
+
 	Rectangle getActiveArea() {
 		Rectangle circleArea = isVertical()
-				? new Rectangle(area.x, area.y + area.height / 2 - CIRCLE_RADIUS, 2 * CIRCLE_RADIUS, 2 * CIRCLE_RADIUS)
-				: new Rectangle(area.x + area.width / 2 - CIRCLE_RADIUS, area.y, 2 * CIRCLE_RADIUS, 2 * CIRCLE_RADIUS);
+				? new Rectangle(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(), 2 * getCircleRadius())
+				: new Rectangle(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(), 2 * getCircleRadius());
 		return circleArea;
 	}
 
 	protected void draw(GC gc, Rectangle area) {
+		Color fg = gc.getForeground();
+		Color bg = gc.getBackground();
+		Font f = gc.getFont();
+		int lw = gc.getLineWidth();
+
 		this.area = area;
 		setupGC(gc);
 		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		drawStep(gc, area);
+
+		gc.setLineWidth(lw);
+		gc.setFont(f);
+		gc.setForeground(fg);
+		gc.setBackground(bg);
 	}
 
 	protected void drawStep(GC gc, final Rectangle area) {
@@ -184,32 +241,40 @@ public class Step extends Composite {
 
 	protected void drawEndLine(GC gc, final Rectangle area) {
 		if (!isLastStep()) {
+			int lw = gc.getLineWidth();
+			gc.setForeground(getLineColor());
+			gc.setLineWidth(getLineWidth());
 			if (isVertical())
-				gc.drawLine(CIRCLE_RADIUS, area.y + area.height / 2 + CIRCLE_RADIUS + LINE_MARGIN, CIRCLE_RADIUS,
+				gc.drawLine(getCircleRadius(), area.y + area.height / 2 + getCircleRadius() + getLinePadding(), getCircleRadius(),
 						area.y + area.height);
 			else
-				gc.drawLine(area.x + area.width / 2 + CIRCLE_RADIUS + LINE_MARGIN, CIRCLE_RADIUS, area.x + area.width,
-						CIRCLE_RADIUS);
+				gc.drawLine(area.x + area.width / 2 + getCircleRadius() + getLinePadding(), getCircleRadius(), area.x + area.width,
+						getCircleRadius());
+			gc.setLineWidth(lw);
 		}
 	}
 
 	protected void drawBeginningLine(GC gc, final Rectangle area) {
 		if (!isFirstStep()) {
+			int lw = gc.getLineWidth();
+			gc.setForeground(getLineColor());
+			gc.setLineWidth(getLineWidth());
 			if (isVertical())
-				gc.drawLine(CIRCLE_RADIUS, area.y, CIRCLE_RADIUS,
-						area.y + area.height / 2 - CIRCLE_RADIUS - LINE_MARGIN);
+				gc.drawLine(getCircleRadius(), area.y, getCircleRadius(),
+						area.y + area.height / 2 - getCircleRadius() - getLinePadding());
 			else
-				gc.drawLine(area.x, CIRCLE_RADIUS, area.x + area.width / 2 - CIRCLE_RADIUS - LINE_MARGIN,
-						CIRCLE_RADIUS);
+				gc.drawLine(area.x, getCircleRadius(), area.x + area.width / 2 - getCircleRadius() - getLinePadding(),
+						getCircleRadius());
+			gc.setLineWidth(lw);
 		}
 	}
 
 	protected void drawCircle(GC gc, Rectangle area) {
 		gc.setBackground(getBackgroundColor());
 		if (isVertical())
-			gc.fillOval(area.x, area.y + area.height / 2 - CIRCLE_RADIUS, 2 * CIRCLE_RADIUS, 2 * CIRCLE_RADIUS);
+			gc.fillOval(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(), 2 * getCircleRadius());
 		else
-			gc.fillOval(area.x + area.width / 2 - CIRCLE_RADIUS, area.y, 2 * CIRCLE_RADIUS, 2 * CIRCLE_RADIUS);
+			gc.fillOval(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(), 2 * getCircleRadius());
 	}
 
 	protected void drawContent(GC gc, Rectangle area) {
@@ -217,9 +282,9 @@ public class Step extends Composite {
 		gc.setFont(getTextFont());
 		Point extent = gc.stringExtent(getText());
 		if (isVertical())
-			gc.drawText(getText(), area.x + CIRCLE_RADIUS - extent.x / 2, area.y + area.height / 2 - extent.y / 2);
+			gc.drawText(getText(), area.x + getCircleRadius() - extent.x / 2, area.y + area.height / 2 - extent.y / 2);
 		else
-			gc.drawText(getText(), area.x + area.width / 2 - extent.x / 2, area.y + CIRCLE_RADIUS - extent.y / 2);
+			gc.drawText(getText(), area.x + area.width / 2 - extent.x / 2, area.y + getCircleRadius() - extent.y / 2);
 	}
 
 	protected void drawDescription(GC gc, Rectangle area) {
@@ -229,10 +294,10 @@ public class Step extends Composite {
 			gc.setFont(getDescriptionFont());
 			Point textExtent = gc.textExtent(description);
 			if (isVertical())
-				gc.drawText(description, area.x + DESCRIPTION_OFFSET, area.y + area.height / 2 - textExtent.y / 2,
+				gc.drawText(description, area.x + getDescriptionOffset(), area.y + area.height / 2 - textExtent.y / 2,
 						true);
 			else
-				gc.drawText(description, area.x + area.width / 2 - textExtent.x / 2, area.y + DESCRIPTION_OFFSET, true);
+				gc.drawText(description, area.x + area.width / 2 - textExtent.x / 2, area.y + getDescriptionOffset(), true);
 		}
 	}
 
@@ -268,8 +333,8 @@ public class Step extends Composite {
 		Point textExtent = gc.textExtent(description);
 		gc.dispose();
 		if (isVertical())
-			return new Point(textExtent.x + DESCRIPTION_OFFSET, -1);
-		return new Point(-1, DESCRIPTION_OFFSET + textExtent.y);
+			return new Point(textExtent.x + getDescriptionOffset(), -1);
+		return new Point(-1, getDescriptionOffset() + textExtent.y);
 	}
 
 }

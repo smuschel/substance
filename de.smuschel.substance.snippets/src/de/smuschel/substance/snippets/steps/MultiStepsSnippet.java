@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import de.smuschel.substance.steps.MultiStepConfiguration;
+import de.smuschel.substance.steps.MultiStepsConfiguration;
 import de.smuschel.substance.steps.MultiSteps;
 import de.smuschel.substance.steps.MultiStepsBuilder;
 
@@ -32,11 +32,14 @@ public class MultiStepsSnippet {
 		Font boldFont = boldDescriptor.createFont(display);
 		MultiSteps ms = MultiStepsBuilder
 				.withConfiguration(
-						MultiStepConfiguration.create()
+						MultiStepsConfiguration.create()
 							.orientation(MultiSteps.HORIZONTAL)
 							.parent(shell)
 							.activeColor(blue)
 							.activeDescriptionFont(boldFont)
+							.lineWidth(2)
+							.linePadding(8)
+							.lineColor(blue)
 						)
 				.withFirstStep("1", "Address \r\nDetails")
 				.withStep("2", "Order Data")

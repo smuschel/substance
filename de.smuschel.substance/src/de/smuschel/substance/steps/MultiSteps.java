@@ -37,8 +37,9 @@ public class MultiSteps extends Canvas {
 
 	protected void click(Event e) {
 		Point clickLocation = new Point(e.x, e.y);
-		for (int i = 0; i < getChildren().length; i++) {
-			Step step = (Step) getChildren()[i];
+		Step[] steps = getSteps();
+		for (int i = 0; i < steps.length; i++) {
+			Step step = steps[i];
 			if (step.getActiveArea().contains(clickLocation)) {
 				setActiveStep(i);
 			}
@@ -48,10 +49,10 @@ public class MultiSteps extends Canvas {
 	protected void paint(Event e) {
 		GC gc = e.gc;
 		Rectangle area = getClientArea();
-		int offsetPerStep = isVertical() ? area.height / getChildren().length : area.width / getChildren().length;
+		Step[] steps = getSteps();
+		int offsetPerStep = isVertical() ? area.height / steps.length : area.width / steps.length;
 		int offset = 0;
-		for (Control c : getChildren()) {
-			Step step = (Step) c;
+		for (Step step : steps) {
 			if (isVertical())
 				step.draw(gc, new Rectangle(0, offset, area.width, offsetPerStep));
 			else
@@ -65,10 +66,11 @@ public class MultiSteps extends Canvas {
 	}
 
 	public void setActiveStep(int index) {
-		Step old = (Step) getChildren()[activeStep];
+		checkWidget();
+		Step old = getSteps()[activeStep];
 		old.setEnabled(false);
 
-		Step newStep = (Step) getChildren()[index];
+		Step newStep = getSteps()[index];
 		newStep.setEnabled(true);
 		activeStep = index;
 
@@ -79,20 +81,24 @@ public class MultiSteps extends Canvas {
 	}
 
 	public void next() {
-		if (getChildren().length > activeStep + 1)
+		checkWidget();
+		if (getSteps().length > activeStep + 1)
 			setActiveStep(activeStep + 1);
 	}
 
 	public void previous() {
+		checkWidget();
 		if (activeStep - 1 >= 0)
 			setActiveStep(activeStep - 1);
 	}
 
 	public void addSelectionListener(SelectionListener listener) {
+		checkWidget();
 		selectionListeners.add(listener);
 	}
 
 	public void removeSelectionListener(SelectionListener listener) {
+		checkWidget();
 		selectionListeners.remove(listener);
 	}
 
@@ -111,8 +117,7 @@ public class MultiSteps extends Canvas {
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		int height = hHint;
 		int width = wHint;
-		for (Control c : getChildren()) {
-			Step step = (Step) c;
+		for (Step step : getSteps()) {
 			Point size = step.computeSize();
 			if (isVertical()) {
 				width = Math.max(width, size.x);
@@ -124,9 +129,22 @@ public class MultiSteps extends Canvas {
 	}
 
 	public void completeCurrentStep() {
-		Step current = (Step) getChildren()[activeStep];
+		checkWidget();
+		Step current = getSteps()[activeStep];
 		current.setCompleted(true);
 		next();
+		update();
+		redraw();
+	}
+
+	private Step[] getSteps() {
+		Control[] children = getChildren();
+		List<Step> steps = new ArrayList<>();
+		for (Control c : children) {
+			if (c instanceof Step)
+				steps.add((Step)c);
+		}
+		return steps.toArray(new Step[] {});
 	}
 
 }
