@@ -23,6 +23,7 @@ public class Step extends Composite {
 	private Font inactiveFont;
 	private Font inactiveDescriptionFont;
 	private Rectangle area;
+	private boolean completed;
 
 	private static final int CIRCLE_RADIUS = 16;
 	private static final int LINE_MARGIN = 4;
@@ -37,6 +38,8 @@ public class Step extends Composite {
 	}
 
 	public String getText() {
+		if (isCompleted())
+			return "\u2713";
 		return text;
 	}
 
@@ -140,13 +143,13 @@ public class Step extends Composite {
 	}
 
 	protected Color getBackgroundColor() {
-		if (isEnabled())
+		if (isEnabled() || isCompleted())
 			return getActiveColor();
 		return getInactiveColor();
 	}
 
 	protected Color getForegroundColor() {
-		if (isEnabled())
+		if (isEnabled() || isCompleted())
 			return getActiveTextColor();
 		return getInactiveTextColor();
 	}
@@ -243,6 +246,14 @@ public class Step extends Composite {
 
 	private boolean isFirstStep() {
 		return (getStyle() & MultiSteps.FIRST) == MultiSteps.FIRST;
+	}
+
+	public void setCompleted(boolean completed) {
+		this.completed = completed;
+	}
+
+	private boolean isCompleted() {
+		return completed;
 	}
 
 	protected void setupGC(GC gc) {

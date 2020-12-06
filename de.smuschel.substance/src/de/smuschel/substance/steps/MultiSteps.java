@@ -123,4 +123,10 @@ public class MultiSteps extends Canvas {
 		return new Point(width, height);
 	}
 
+	public void completeCurrentStep() {
+		Step current = (Step) getChildren()[activeStep];
+		current.setCompleted(true);
+		next();
+	}
+
 }

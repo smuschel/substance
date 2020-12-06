@@ -59,9 +59,9 @@ public class MultiStepsSnippet {
 
 		Composite buttonBar = new Composite(shell, SWT.NONE);
 		buttonBar.setLayout(new RowLayout());
-		Button b = new Button(buttonBar, SWT.PUSH);
-		b.setText("<<");
-		b.addSelectionListener(new SelectionAdapter() {
+		Button prev = new Button(buttonBar, SWT.PUSH);
+		prev.setText("<<");
+		prev.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -70,9 +70,20 @@ public class MultiStepsSnippet {
 
 		});
 
-		Button b1 = new Button(buttonBar, SWT.PUSH);
-		b1.setText(">>");
-		b1.addSelectionListener(new SelectionAdapter() {
+		Button done = new Button(buttonBar, SWT.PUSH);
+		done.setText("Done");
+		done.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ms.completeCurrentStep();
+			}
+
+		});
+
+		Button next = new Button(buttonBar, SWT.PUSH);
+		next.setText(">>");
+		next.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
