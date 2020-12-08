@@ -22,3 +22,6 @@ may be added in the future.
 				.build();
 		ms.setActiveStep(0);
 ```
+
+There's a MultiStepsSnippet in project de.smuschel.substance.snippets, that you may use as reference.
+![Sample Application](https://raw.githubusercontent.com/smuschel/substance/master/resources/MultiSteps.png)
