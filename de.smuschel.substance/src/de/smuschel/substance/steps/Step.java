@@ -8,11 +8,21 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * A Step used in the MultiSteps widget
+ *
+ * @author Simon Muschel
+ *
+ */
 public class Step extends Composite {
 
+	// Radius of the circle (the active area of a Step)
 	private static final int CIRCLE_RADIUS = 16;
+	// Line padding - distance between end/beginning of line and circls
 	private static final int LINE_PADDING = 4;
+	// Offset of description text
 	private static final int DESCRIPTION_OFFSET = 48;
+	// Width of line connecting Steps
 	private static final int LINE_WIDTH = 1;
 
 	private String text;
@@ -36,129 +46,301 @@ public class Step extends Composite {
 	private int descriptionOffset;
 	private int lineWidth;
 
+	/**
+	 * Constructs a Step widget. The supported styles are the styles defined in
+	 * class <code>MultiSteps</code>: - FIRST - LAST - HORIZONTAL - VERTICAL
+	 *
+	 * @param parent the parent element (should be a MultiSteps widget)
+	 * @param style  Style constant
+	 */
 	public Step(Composite parent, int style) {
 		super(parent, style);
 	}
 
+	/**
+	 * Set the text painted inside the circle
+	 *
+	 * @param text The text
+	 */
 	public void setText(String text) {
 		this.text = text;
 	}
 
+	/**
+	 * Get the text painted inside the circle. If Step is completed, returns a check
+	 * mark (Unicode \u2713)
+	 *
+	 * @return Current text
+	 */
 	public String getText() {
 		if (isCompleted())
 			return "\u2713";
 		return text;
 	}
 
+	/**
+	 * Set the description text for this Step
+	 *
+	 * @param description Step description
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * Get this Steps description
+	 *
+	 * @return the description
+	 */
 	public String getDescription() {
 		return description;
 	}
 
+	/**
+	 * Get the active color. Either returns the Color instance passed in via
+	 * <code>setActiveColor</code> or, if that is <code>null</code> returns
+	 * SWT.COLOR_BLUE
+	 *
+	 * @return SWT color object
+	 */
 	public Color getActiveColor() {
 		return activeColor == null ? getDisplay().getSystemColor(SWT.COLOR_BLUE) : activeColor;
 	}
 
+	/**
+	 * Set the active color
+	 *
+	 * @param activeColor SWT color object
+	 */
 	public void setActiveColor(Color activeColor) {
 		this.activeColor = activeColor;
 	}
 
+	/**
+	 * Get the inactive color. Either returns the Color instance passed in via
+	 * <code>setInactiveColor</code> or, if that is <code>null</code> returns
+	 * SWT.COLOR_GRAY
+	 *
+	 * @return SWT color object
+	 */
 	public Color getInactiveColor() {
 		return inactiveColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY) : inactiveColor;
 	}
 
+	/**
+	 * Set the inactive color
+	 *
+	 * @param inactiveColor SWT color object
+	 */
 	public void setInactiveColor(Color inactiveColor) {
 		this.inactiveColor = inactiveColor;
 	}
 
+	/**
+	 * Get the active text color. Either returns the Color instance passed in via
+	 * <code>setActiveTextColor</code> or, if that is <code>null</code> returns
+	 * SWT.COLOR_WHITE
+	 *
+	 * @return SWT color object
+	 */
 	public Color getActiveTextColor() {
 		return activeTextColor == null ? getDisplay().getSystemColor(SWT.COLOR_WHITE) : activeTextColor;
 	}
 
+	/**
+	 * Set the active text color
+	 *
+	 * @param activeTextColor SWT color object
+	 */
 	public void setActiveTextColor(Color activeTextColor) {
 		this.activeTextColor = activeTextColor;
 	}
 
+	/**
+	 * Get the active description color. Either returns the Color instance passed in
+	 * via <code>setActiveDescriptionColor</code> or, if that is <code>null</code>
+	 * returns SWT.COLOR_BLACK
+	 *
+	 * @return SWT color object
+	 */
 	public Color getActiveDescriptionColor() {
 		return activeDescriptionColor == null ? getDisplay().getSystemColor(SWT.COLOR_BLACK) : activeDescriptionColor;
 	}
 
+	/**
+	 * Set the active description color
+	 *
+	 * @param activeDescriptionColor SWT color object
+	 */
 	public void setActiveDescriptionColor(Color activeDescriptionColor) {
 		this.activeDescriptionColor = activeDescriptionColor;
 	}
 
+	/**
+	 * Get the inactive text color. Either returns the Color instance passed in via
+	 * <code>setInctiveTextColor</code> or, if that is <code>null</code> returns
+	 * SWT.COLOR_BLACK
+	 *
+	 * @return SWT color object
+	 */
 	public Color getInactiveTextColor() {
 		return inactiveTextColor == null ? getDisplay().getSystemColor(SWT.COLOR_BLACK) : inactiveTextColor;
 	}
 
+	/**
+	 * Set the inactive text color
+	 *
+	 * @param inactiveTextColor SWT color object
+	 */
 	public void setInactiveTextColor(Color inactiveTextColor) {
 		this.inactiveTextColor = inactiveTextColor;
 	}
 
+	/**
+	 * Get the inactive description color. Either returns the Color instance passed
+	 * in via <code>setInctiveDescriptionColor</code> or, if that is
+	 * <code>null</code> returns SWT.COLOR_GRAY
+	 *
+	 * @return SWT color object
+	 */
 	public Color getInactiveDescriptionColor() {
 		return inactiveDescriptionColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY)
 				: inactiveDescriptionColor;
 	}
 
+	/**
+	 * Set the color used to paint the line connecting two Steps.
+	 *
+	 * @param lineColor SWT color object
+	 */
 	public void setLineColor(Color lineColor) {
 		this.lineColor = lineColor;
 	}
 
+	/**
+	 * Get the line color. Either returns the Color instance passed in via
+	 * <code>setLineColor</code> or, if that is <code>null</code> returns
+	 * SWT.COLOR_GRAY
+	 *
+	 * @return SWT color object
+	 */
 	public Color getLineColor() {
 		return lineColor == null ? getDisplay().getSystemColor(SWT.COLOR_GRAY) : lineColor;
 	}
 
+	/**
+	 * Get the font used to paint the text inside the circle
+	 *
+	 * @return SWT font object
+	 */
 	public Font getActiveFont() {
 		return activeFont;
 	}
 
+	/**
+	 * Set the font used to paint the text inside the circle
+	 *
+	 * @param activeFont SWT font object
+	 */
 	public void setActiveFont(Font activeFont) {
 		this.activeFont = activeFont;
 	}
 
+	/**
+	 * Get the font used to paint the description text
+	 *
+	 * @return SWT font object
+	 */
 	public Font getActiveDescriptionFont() {
 		return activeDescriptionFont;
 	}
 
+	/**
+	 * Set the font used to paint the description text
+	 *
+	 * @param activeDescriptionFont SWT font object
+	 */
 	public void setActiveDescriptionFont(Font activeDescriptionFont) {
 		this.activeDescriptionFont = activeDescriptionFont;
 	}
 
+	/**
+	 * Get the font used to paint the text inside the circle for inactive Steps
+	 *
+	 * @return SWT font object
+	 */
 	public Font getInactiveFont() {
 		return inactiveFont;
 	}
 
+	/**
+	 * Set the font used to paint the text inside the circle for inactive Steps
+	 *
+	 * @param inactiveFont SWT font object
+	 */
 	public void setInactiveFont(Font inactiveFont) {
 		this.inactiveFont = inactiveFont;
 	}
 
+	/**
+	 * Get the font used to paint the description text for inactive Steps
+	 *
+	 * @return SWT font object
+	 */
 	public Font getInactiveDescriptionFont() {
 		return inactiveDescriptionFont;
 	}
 
+	/**
+	 * Set the font used to paint the description text for inactive Steps
+	 *
+	 * @param inactiveDescriptionFont SWT font object
+	 */
 	public void setInactiveDescriptionFont(Font inactiveDescriptionFont) {
 		this.inactiveDescriptionFont = inactiveDescriptionFont;
 	}
 
+	/**
+	 * Set the color used to paint the description text of inactive Steps
+	 *
+	 * @param inactiveDescriptionColor SWT color object
+	 */
 	public void setInactiveDescriptionColor(Color inactiveDescriptionColor) {
 		this.inactiveDescriptionColor = inactiveDescriptionColor;
 	}
 
+	/**
+	 * Set the circle's radius
+	 *
+	 * @param radius radius in pixels
+	 */
 	public void setCircleRadius(int radius) {
 		this.circleRadius = radius;
 	}
 
+	/**
+	 * Set the description text's offset. Recommendation: 3 * circle radius
+	 *
+	 * @param offset offset in pixels
+	 */
 	public void setDescriptionOffset(int offset) {
 		this.descriptionOffset = offset;
 	}
 
+	/**
+	 * Line padding - the distance between beginning/end of line and circle
+	 *
+	 * @param padding padding in pixels
+	 */
 	public void setLinePadding(int padding) {
 		this.linePadding = padding;
 	}
 
+	/**
+	 * Width of the line connecting Steps
+	 *
+	 * @param width width in pixels
+	 */
 	public void setLineWidth(int width) {
 		this.lineWidth = width;
 	}
@@ -209,8 +391,10 @@ public class Step extends Composite {
 
 	Rectangle getActiveArea() {
 		Rectangle circleArea = isVertical()
-				? new Rectangle(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(), 2 * getCircleRadius())
-				: new Rectangle(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(), 2 * getCircleRadius());
+				? new Rectangle(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(),
+						2 * getCircleRadius())
+				: new Rectangle(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(),
+						2 * getCircleRadius());
 		return circleArea;
 	}
 
@@ -245,11 +429,11 @@ public class Step extends Composite {
 			gc.setForeground(getLineColor());
 			gc.setLineWidth(getLineWidth());
 			if (isVertical())
-				gc.drawLine(getCircleRadius(), area.y + area.height / 2 + getCircleRadius() + getLinePadding(), getCircleRadius(),
-						area.y + area.height);
+				gc.drawLine(getCircleRadius(), area.y + area.height / 2 + getCircleRadius() + getLinePadding(),
+						getCircleRadius(), area.y + area.height);
 			else
-				gc.drawLine(area.x + area.width / 2 + getCircleRadius() + getLinePadding(), getCircleRadius(), area.x + area.width,
-						getCircleRadius());
+				gc.drawLine(area.x + area.width / 2 + getCircleRadius() + getLinePadding(), getCircleRadius(),
+						area.x + area.width, getCircleRadius());
 			gc.setLineWidth(lw);
 		}
 	}
@@ -272,9 +456,11 @@ public class Step extends Composite {
 	protected void drawCircle(GC gc, Rectangle area) {
 		gc.setBackground(getBackgroundColor());
 		if (isVertical())
-			gc.fillOval(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(), 2 * getCircleRadius());
+			gc.fillOval(area.x, area.y + area.height / 2 - getCircleRadius(), 2 * getCircleRadius(),
+					2 * getCircleRadius());
 		else
-			gc.fillOval(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(), 2 * getCircleRadius());
+			gc.fillOval(area.x + area.width / 2 - getCircleRadius(), area.y, 2 * getCircleRadius(),
+					2 * getCircleRadius());
 	}
 
 	protected void drawContent(GC gc, Rectangle area) {
@@ -297,7 +483,8 @@ public class Step extends Composite {
 				gc.drawText(description, area.x + getDescriptionOffset(), area.y + area.height / 2 - textExtent.y / 2,
 						true);
 			else
-				gc.drawText(description, area.x + area.width / 2 - textExtent.x / 2, area.y + getDescriptionOffset(), true);
+				gc.drawText(description, area.x + area.width / 2 - textExtent.x / 2, area.y + getDescriptionOffset(),
+						true);
 		}
 	}
 
@@ -313,6 +500,11 @@ public class Step extends Composite {
 		return (getStyle() & MultiSteps.FIRST) == MultiSteps.FIRST;
 	}
 
+	/**
+	 * Mark this Step as completed
+	 *
+	 * @param completed true, if Step is complete; false otherwise
+	 */
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}

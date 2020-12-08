@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import de.smuschel.substance.steps.MultiStepsConfiguration;
 import de.smuschel.substance.steps.MultiSteps;
 import de.smuschel.substance.steps.MultiStepsBuilder;
+import de.smuschel.substance.steps.MultiStepsConfiguration;
 
 public class MultiStepsSnippet {
 
