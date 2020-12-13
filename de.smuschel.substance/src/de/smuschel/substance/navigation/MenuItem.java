@@ -12,16 +12,43 @@ import org.eclipse.swt.widgets.Event;
 
 public class MenuItem extends Canvas {
 	private Color animationBackgroundDark = new Color(220, 220, 220);
+	private Color hoverBackground = new Color(240, 240, 240);
 	private ClickBackgroundAnimation clickBackgroundAnimation;
+	private String text;
+	private Image image;
+	private Color background;
 
 	public MenuItem(Composite parent, int style) {
 		super(parent, style);
 		init();
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public void setImage(Image image) {
+		this.image = image;
+	}
+
 	protected void init() {
+		background = getDisplay().getSystemColor(SWT.COLOR_WHITE);
 		addListener(SWT.Paint, e -> paint(e));
 		addListener(SWT.MouseUp, e -> click(e));
+		addListener(SWT.MouseEnter, e -> enter(e));
+		addListener(SWT.MouseExit, e -> exit(e));
+
+		setCapture(true);
+	}
+
+	protected void enter(Event e) {
+		background = hoverBackground;
+		redraw();
+	}
+
+	protected void exit(Event e) {
+		background = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		redraw();
 	}
 
 	protected void click(Event e) {
@@ -38,35 +65,44 @@ public class MenuItem extends Canvas {
 	}
 
 	protected void drawTextLayer(GC gc, Rectangle area) {
-		Point textArea = gc.textExtent("Klick mich!");
 		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-		gc.drawText("Klick mich!", area.width / 2 - textArea.x / 2, area.height / 2 - textArea.y / 2, true);
+		int x = 47;
+		if (image != null) {
+			gc.drawImage(image, 10, 8);
+		}
+		Point textArea = gc.textExtent(text);
+		gc.drawText(text, x, area.height / 2 - textArea.y / 2, true);
 	}
 
 	protected void drawAnimationLayer(GC gc, Rectangle area) {
 		if (clickBackgroundAnimation != null && !clickBackgroundAnimation.animationFinished()) {
 			clickBackgroundAnimation.draw(gc, area);
 		} else {
-			gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			gc.setBackground(background);
+			gc.fillRectangle(area);
 		}
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
+		hoverBackground.dispose();
 		animationBackgroundDark.dispose();
+		clickBackgroundAnimation.dispose();
 	}
 
 	private class ClickBackgroundAnimation implements Runnable {
-
-		static final int TIMER_INTERVALL = 30;
+		static final int ALPHA_MAX = 255;
+		static final int TIMER_INTERVALL = 35;
+		static final int RADIUS_INCREMENT = 10;
+		static final int ALPHA_DECREMENT = 10;
 		private int clickXPos;
 		private int clickYPos;
 		private int radius = 0;
 		private GC animationGc;
-		private int alpha = 255;
-		private int alphaStep = 10;
+		private int alpha = ALPHA_MAX;
+		private int alphaStep = ALPHA_DECREMENT;
 		private Image image;
 		private boolean animationFinished;
 
@@ -89,12 +125,14 @@ public class MenuItem extends Canvas {
 				image.dispose();
 			image = new Image(getDisplay(), getClientArea());
 			animationFinished = false;
+			if (animationGc != null)
+				animationGc.dispose();
 			animationGc = new GC(image);
 		}
 
 		public void draw(GC gc, Rectangle area) {
-			animationGc.setAlpha(255);
-			animationGc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			animationGc.setAlpha(ALPHA_MAX);
+			animationGc.setBackground(background);
 			animationGc.fillRectangle(area);
 			animationGc.setAlpha(alpha);
 			int x = clickXPos - radius;
@@ -114,14 +152,14 @@ public class MenuItem extends Canvas {
 		}
 
 		boolean animate() {
-			radius += 10;
+			radius += RADIUS_INCREMENT;
 			if (!MenuItem.this.isDisposed())
 				MenuItem.this.redraw();
 
 			Rectangle area = getClientArea();
-			alphaStep = (clickXPos < area.width / 2) ? (area.width - clickXPos) / 10 : clickXPos / 10;
-			if (farSideReached(clickXPos, radius, area.width)
-					&& farSideReached(clickYPos, radius, area.height)) {
+			alphaStep = (clickXPos < area.width / 2) ? ALPHA_MAX / ((area.width - clickXPos) / RADIUS_INCREMENT)
+					: ALPHA_MAX / (clickXPos / RADIUS_INCREMENT);
+			if (farSideReached(clickXPos, radius, area.width) && farSideReached(clickYPos, radius, area.height)) {
 				animationFinished = true;
 				return false;
 			}
@@ -138,6 +176,13 @@ public class MenuItem extends Canvas {
 			} else {
 				return (location - radius) < 0;
 			}
+		}
+
+		public void dispose() {
+			if (image != null)
+				image.dispose();
+			if (animationGc != null)
+				animationGc.dispose();
 		}
 	}
 
