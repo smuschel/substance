@@ -11,12 +11,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
 public class MenuItem extends Canvas {
-	private Color animationBackgroundDark = new Color(220, 220, 220);
-	private Color hoverBackground = new Color(240, 240, 240);
+	private final Color animationBackgroundDefault = new Color(220, 220, 220);
+	private final Color hoverBackgroundDefault = new Color(240, 240, 240);
+	private Color animationBackground;
+	private Color hoverBackground;
 	private ClickBackgroundAnimation clickBackgroundAnimation;
 	private String text;
 	private Image image;
 	private Color background;
+	private int innerPadding = 5;
+	private int imageTextPadding = 5;
 
 	public MenuItem(Composite parent, int style) {
 		super(parent, style);
@@ -32,7 +36,7 @@ public class MenuItem extends Canvas {
 	}
 
 	protected void init() {
-		background = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		background = getBackground();
 		addListener(SWT.Paint, e -> paint(e));
 		addListener(SWT.MouseUp, e -> click(e));
 		addListener(SWT.MouseEnter, e -> enter(e));
@@ -42,18 +46,20 @@ public class MenuItem extends Canvas {
 	}
 
 	protected void enter(Event e) {
-		background = hoverBackground;
+		background = getHoverBackground();
 		redraw();
 	}
 
 	protected void exit(Event e) {
-		background = getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		background = getBackground();
 		redraw();
 	}
 
 	protected void click(Event e) {
-		clickBackgroundAnimation = new ClickBackgroundAnimation(e.x, e.y);
-		clickBackgroundAnimation.startAnimation();
+		if (e.button == 1) {
+			clickBackgroundAnimation = new ClickBackgroundAnimation(e.x, e.y);
+			clickBackgroundAnimation.startAnimation();
+		}
 	}
 
 	protected void paint(Event e) {
@@ -65,11 +71,10 @@ public class MenuItem extends Canvas {
 	}
 
 	protected void drawTextLayer(GC gc, Rectangle area) {
-		gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-		int x = 47;
+		int x = innerPadding;
 		if (image != null) {
-			gc.drawImage(image, 10, 8);
+			x += imageTextPadding + image.getBounds().width;
+			gc.drawImage(image, 5, (area.height - image.getBounds().height) / 2);
 		}
 		Point textArea = gc.textExtent(text);
 		gc.drawText(text, x, area.height / 2 - textArea.y / 2, true);
@@ -87,9 +92,32 @@ public class MenuItem extends Canvas {
 	@Override
 	public void dispose() {
 		super.dispose();
-		hoverBackground.dispose();
-		animationBackgroundDark.dispose();
+		hoverBackgroundDefault.dispose();
+		animationBackgroundDefault.dispose();
 		clickBackgroundAnimation.dispose();
+	}
+
+
+	@Override
+	public void setBackground(Color color) {
+		super.setBackground(color);
+		background = color;
+	}
+
+	public void setHoverBackground(Color hoverBackground) {
+		this.hoverBackground = hoverBackground;
+	}
+
+	public void setAnimationBackground(Color animationBackground) {
+		this.animationBackground = animationBackground;
+	}
+
+	protected Color getAnimationBackground() {
+		return animationBackground == null ? animationBackgroundDefault : animationBackground;
+	}
+
+	protected Color getHoverBackground() {
+		return hoverBackground == null ? hoverBackgroundDefault : hoverBackground;
 	}
 
 	private class ClickBackgroundAnimation implements Runnable {
@@ -97,6 +125,7 @@ public class MenuItem extends Canvas {
 		static final int TIMER_INTERVALL = 35;
 		static final int RADIUS_INCREMENT = 10;
 		static final int ALPHA_DECREMENT = 10;
+		
 		private int clickXPos;
 		private int clickYPos;
 		private int radius = 0;
@@ -130,7 +159,7 @@ public class MenuItem extends Canvas {
 			animationGc = new GC(image);
 		}
 
-		public void draw(GC gc, Rectangle area) {
+		void draw(GC gc, Rectangle area) {
 			animationGc.setAlpha(ALPHA_MAX);
 			animationGc.setBackground(background);
 			animationGc.fillRectangle(area);
@@ -138,7 +167,7 @@ public class MenuItem extends Canvas {
 			int x = clickXPos - radius;
 			int y = clickYPos - radius;
 
-			animationGc.setBackground(animationBackgroundDark);
+			animationGc.setBackground(getAnimationBackground());
 			animationGc.fillOval(x, y, 2 * radius, 2 * radius);
 
 			if (image != null)
@@ -157,8 +186,7 @@ public class MenuItem extends Canvas {
 				MenuItem.this.redraw();
 
 			Rectangle area = getClientArea();
-			alphaStep = (clickXPos < area.width / 2) ? ALPHA_MAX / ((area.width - clickXPos) / RADIUS_INCREMENT)
-					: ALPHA_MAX / (clickXPos / RADIUS_INCREMENT);
+			calculateAlphaReductionPerStep(area);
 			if (farSideReached(clickXPos, radius, area.width) && farSideReached(clickYPos, radius, area.height)) {
 				animationFinished = true;
 				return false;
@@ -168,6 +196,11 @@ public class MenuItem extends Canvas {
 			if (alpha < 1)
 				alpha = 1;
 			return true;
+		}
+
+		void calculateAlphaReductionPerStep(Rectangle area) {
+			alphaStep = (clickXPos < area.width / 2) ? ALPHA_MAX / ((area.width - clickXPos) / RADIUS_INCREMENT)
+					: ALPHA_MAX / (clickXPos / RADIUS_INCREMENT);
 		}
 
 		boolean farSideReached(int location, int radius, int dimension) {

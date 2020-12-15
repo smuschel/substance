@@ -38,8 +38,12 @@ public class MenuItemSnippet {
 		MenuItem item2 = new MenuItem(shell, SWT.NONE);
 		item2.setText("Menu Item 2");
 		item2.setImage(cart);
+		item2.setBackground(display.getSystemColor(SWT.COLOR_RED));
+		item2.setHoverBackground(new Color(255, 100, 100));
+		item2.setAnimationBackground(new Color(255, 50, 50));
+		item2.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		GridData gd2 = new GridData();
-		gd2.widthHint = 200;
+		gd2.widthHint = 250;
 		gd2.heightHint = 40;
 		item2.setFont(boldFont);
 		item2.setLayoutData(gd2);
