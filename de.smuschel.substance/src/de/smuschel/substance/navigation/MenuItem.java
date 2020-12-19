@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
 public class MenuItem extends Canvas {
-	private final Color animationBackgroundDefault = new Color(220, 220, 220);
-	private final Color hoverBackgroundDefault = new Color(240, 240, 240);
+	private final Color animationBackgroundDefault = new Color(getDisplay(), 220, 220, 220);
+	private final Color hoverBackgroundDefault = new Color(getDisplay(), 240, 240, 240);
 	private Color animationBackground;
 	private Color hoverBackground;
 	private ClickBackgroundAnimation clickBackgroundAnimation;
@@ -76,8 +76,10 @@ public class MenuItem extends Canvas {
 			x += imageTextPadding + image.getBounds().width;
 			gc.drawImage(image, 5, (area.height - image.getBounds().height) / 2);
 		}
-		Point textArea = gc.textExtent(text);
-		gc.drawText(text, x, area.height / 2 - textArea.y / 2, true);
+		if ((getStyle() & SWT.MIN) != SWT.MIN) {
+			Point textArea = gc.textExtent(text);
+			gc.drawText(text, x, area.height / 2 - textArea.y / 2, true);
+		}
 	}
 
 	protected void drawAnimationLayer(GC gc, Rectangle area) {
@@ -96,7 +98,6 @@ public class MenuItem extends Canvas {
 		animationBackgroundDefault.dispose();
 		clickBackgroundAnimation.dispose();
 	}
-
 
 	@Override
 	public void setBackground(Color color) {
@@ -123,15 +124,13 @@ public class MenuItem extends Canvas {
 	private class ClickBackgroundAnimation implements Runnable {
 		static final int ALPHA_MAX = 255;
 		static final int TIMER_INTERVALL = 35;
-		static final int RADIUS_INCREMENT = 10;
 		static final int ALPHA_DECREMENT = 10;
-		
+
 		private int clickXPos;
 		private int clickYPos;
 		private int radius = 0;
 		private GC animationGc;
 		private int alpha = ALPHA_MAX;
-		private int alphaStep = ALPHA_DECREMENT;
 		private Image image;
 		private boolean animationFinished;
 
@@ -181,26 +180,26 @@ public class MenuItem extends Canvas {
 		}
 
 		boolean animate() {
-			radius += RADIUS_INCREMENT;
 			if (!MenuItem.this.isDisposed())
 				MenuItem.this.redraw();
 
 			Rectangle area = getClientArea();
-			calculateAlphaReductionPerStep(area);
+			radius += calculateRadiusIncrement(area);
 			if (farSideReached(clickXPos, radius, area.width) && farSideReached(clickYPos, radius, area.height)) {
 				animationFinished = true;
 				return false;
 			}
 
-			alpha -= alphaStep;
+			alpha -= ALPHA_DECREMENT;
 			if (alpha < 1)
 				alpha = 1;
 			return true;
 		}
 
-		void calculateAlphaReductionPerStep(Rectangle area) {
-			alphaStep = (clickXPos < area.width / 2) ? ALPHA_MAX / ((area.width - clickXPos) / RADIUS_INCREMENT)
-					: ALPHA_MAX / (clickXPos / RADIUS_INCREMENT);
+		int calculateRadiusIncrement(Rectangle area) {
+			if ((getStyle() & SWT.MIN) == SWT.MIN)
+				return 3;
+			return area.width / 30;
 		}
 
 		boolean farSideReached(int location, int radius, int dimension) {

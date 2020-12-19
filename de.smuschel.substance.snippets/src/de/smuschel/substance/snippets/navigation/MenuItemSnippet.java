@@ -39,8 +39,8 @@ public class MenuItemSnippet {
 		item2.setText("Menu Item 2");
 		item2.setImage(cart);
 		item2.setBackground(display.getSystemColor(SWT.COLOR_RED));
-		item2.setHoverBackground(new Color(255, 100, 100));
-		item2.setAnimationBackground(new Color(255, 50, 50));
+		item2.setHoverBackground(new Color(display, 255, 100, 100));
+		item2.setAnimationBackground(new Color(display, 255, 50, 50));
 		item2.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		GridData gd2 = new GridData();
 		gd2.widthHint = 250;
@@ -55,6 +55,15 @@ public class MenuItemSnippet {
 		gd3.heightHint = 40;
 		item3.setFont(boldFont);
 		item3.setLayoutData(gd3);
+
+		MenuItem item4 = new MenuItem(shell, SWT.MIN);
+		item4.setText("Menu Item 4");
+		item4.setImage(calendar);
+		GridData gd4 = new GridData();
+		gd4.widthHint = 34;
+		gd4.heightHint = 40;
+		item4.setFont(boldFont);
+		item4.setLayoutData(gd4);
 
 		shell.setSize(700, 350);
 		shell.open();
